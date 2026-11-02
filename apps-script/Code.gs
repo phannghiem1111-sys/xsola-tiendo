@@ -1,6 +1,8 @@
 // Google Apps Script – lưu tiến độ Xsola vào Google Sheet.
 // Dán toàn bộ file này vào Extensions > Apps Script của Google Sheet, rồi Deploy > Web app.
 const SHEETS = ["progress", "tasks"];
+// Khóa ghi: đặt trùng với khóa Claude gửi riêng cho anh. KHÔNG commit khóa thật lên GitHub.
+const EDIT_KEY = "DAN_KHOA_GHI_VAO_DAY";
 const HEAD = ["id", "trang_thai", "ngay", "ghi_chu", "json", "cap_nhat"];
 
 function sh_(name) {
@@ -26,6 +28,7 @@ function doPost(e) {
   lock.waitLock(20000);
   try {
     const m = JSON.parse(e.postData.contents);
+    if (m.key !== EDIT_KEY) throw new Error("không có quyền chỉnh sửa");
     if (m.action !== "set" || SHEETS.indexOf(m.coll) < 0 || !m.id) throw new Error("bad request");
     const s = sh_(m.coll);
     const last = s.getLastRow();
@@ -35,6 +38,8 @@ function doPost(e) {
     const vals = [m.id, d.s || (d.done ? "done" : ""), d.d || "", d.n || "", JSON.stringify(d), new Date()];
     if (row > 0) s.getRange(row, 1, 1, vals.length).setValues([vals]); else s.appendRow(vals);
     return ContentService.createTextOutput(JSON.stringify({ ok: true })).setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ ok: false, error: String(err.message || err) })).setMimeType(ContentService.MimeType.JSON);
   } finally {
     lock.releaseLock();
   }
