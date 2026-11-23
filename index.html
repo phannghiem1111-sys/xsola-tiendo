@@ -277,7 +277,7 @@ const TASKS=[
   ["h3","B3. MPO làm việc với các phòng (Pháp chế, Kế toán, Tài chính) xin ý kiến, thống nhất HĐ","","28/10"],
   ["h4","B4. Tổng hợp nội dung, gửi công ty Xsola đồng thuận","","03/11"],
   ["h5","B5. Nếu chưa đồng thuận: họp hai bên Xsola và WCM để thống nhất điều khoản","","04/11"],
-  ["h6","B6. Ký hợp đồng triển khai dự án","","05/11–10/11"]]],
+  ["h6","B6. Ký hợp đồng triển khai dự án","Đang chờ ký HĐ (cập nhật 23/11/2026). Chưa ký nên lịch thi công GĐ1 chưa tính chậm","Chờ ký"]]],
  ["Chuẩn bị (trước 15/11)",[
   ["c1","Chốt danh sách 2.033 CH nhiệt độ và 306 CH Sola khảo sát (dự kiến lắp 150 CH) với khách hàng","Dựa trên file DS CH tháng 11, loại HCM (Kom) và CH Hà Nội Benkon đã làm","28/10"],
   ["c2","Khảo sát toàn bộ 213 CH Đà Nẵng","Nguồn điện, tủ mát/tủ đông, vị trí lắp cảm biến, sóng mạng","30/10"],
@@ -304,6 +304,7 @@ const TASKS=[
   ["k1","Nghiệm thu tổng, bàn giao hồ sơ cho khách hàng","","31/12"],
   ["k2","Báo cáo tổng kết: số CH, vật tư, chi phí, tồn đọng","","31/12"]]]
 ];
+const HD_PENDING=true; // XSOLA chưa ký HĐ (B6): hiển thị "Chờ ký HĐ" thay vì "Chậm"
 const ST={todo:"Chưa làm",doing:"Khảo sát",reinforce:"Đang gia cố",done:"Hoàn thành",issue:"Đang vướng",inelig:"Không đủ điều kiện lắp đặt"};
 const $=s=>document.querySelector(s);
 const fmt=n=>n.toLocaleString("vi-VN");
@@ -335,7 +336,7 @@ function renderSummary(){
   $("#b-so").style.width=Math.min(100,soDone*2)+"%";
   const pn=plannedToDate(DATA.nd,WEEKS),ps=plannedToDate(DATA.sola,SW);
   $("#m-nd").style.left=Math.min(100,pn*100/(DATA.nd.length+Q1N))+"%";$("#m-so").style.left=Math.min(100,ps*2)+"%";
-  const lag=(d,p,lbl)=>p===0?'<span class="pill p-mut">Chưa bắt đầu</span> '+lbl:(d>=p?'<span class="pill p-ok">Đúng tiến độ</span>':'<span class="pill '+(d>=p*.85?'p-warn':'p-bad')+'">Chậm '+fmt(p-d)+' CH</span>')+' Kế hoạch đến hôm nay: '+fmt(p);
+  const lag=(d,p,lbl)=>HD_PENDING?'<span class="pill p-warn">Chờ ký HĐ</span> Chưa tính chậm, KH đến hôm nay: '+fmt(p)+' CH':p===0?'<span class="pill p-mut">Chưa bắt đầu</span> '+lbl:(d>=p?'<span class="pill p-ok">Đúng tiến độ</span>':'<span class="pill '+(d>=p*.85?'p-warn':'p-bad')+'">Chậm '+fmt(p-d)+' CH</span>')+' Kế hoạch đến hôm nay: '+fmt(p);
   $("#t-nd").innerHTML=lag(ndDone,pn,"Bắt đầu 15/11");$("#t-so").innerHTML=lag(soDone,ps,"Bắt đầu 15/11");
   const cw=curWeek(WEEKS);
   $("#wk").innerHTML=WEEKS.map(([w,d])=>{
